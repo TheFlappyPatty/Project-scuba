@@ -16,15 +16,21 @@ public class PlayerControler : MonoBehaviour
     private void Start()
     {
         PlayerBody = gameObject.GetComponent<Rigidbody>();
+            Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void Update()
     {
-
+        Y = Mathf.Clamp(Y,-80, 90);
         X += Input.GetAxis("Mouse X") * Sensitivity;
-
         Y += Input.GetAxis("Mouse Y") * Sensitivity;
-        Camera.transform.rotation =  new Quaternion(0,X,Y,0);
+        Camera.transform.rotation = Quaternion.Euler(-Y,X,0);
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+
             PlayerBody.AddForce(-Input.GetAxis("Horizontal") * movementSpeed, 0,-Input.GetAxis("Vertical") * movementSpeed);
 
     }
