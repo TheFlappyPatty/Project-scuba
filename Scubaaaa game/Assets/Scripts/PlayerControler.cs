@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class PlayerControler : MonoBehaviour
 {
-    public float movementSpeed;
+    private float movementSpeed = 100;
+    [Range(10,0)]
+    public float sliprisistants;
+    public float MaxSpeed;
     public float Sensitivity = 0.5f;
     public Rigidbody PlayerBody;
     public GameObject Camera;
@@ -21,17 +24,25 @@ public class PlayerControler : MonoBehaviour
 
     public void Update()
     {
-        Y = Mathf.Clamp(Y,-80, 90);
-        X += Input.GetAxis("Mouse X") * Sensitivity;
-        Y += Input.GetAxis("Mouse Y") * Sensitivity;
-        Camera.transform.rotation = Quaternion.Euler(-Y,X,0);
+        //Mouse Controles and cursor lock
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Cursor.lockState = CursorLockMode.None;
         }
+        X += Input.GetAxis("Mouse X") * Sensitivity;
+        Y += Input.GetAxis("Mouse Y") * Sensitivity;
+        Y = Mathf.Clamp(Y,-80, 90);
+        Camera.transform.rotation = Quaternion.Euler(-Y,X,0);
 
-
-            PlayerBody.AddForce(-Input.GetAxis("Horizontal") * movementSpeed, 0,-Input.GetAxis("Vertical") * movementSpeed);
+        //Player movement and direction
+        Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x,0,Camera.transform.forward.normalized.z);
+        Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
+        PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed,ForceMode.Force);
+        PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed,ForceMode.Force);
+        if (PlayerBody.velocity.magnitude > MaxSpeed)
+        {
+            PlayerBody.velocity = PlayerBody.velocity.normalized * MaxSpeed;
+        }
 
     }
 
