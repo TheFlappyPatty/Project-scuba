@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PlayerControler : MonoBehaviour
 {
-    private float movementSpeed = 100;
-    [Range(10,0)]
+    public float movementSpeed = 100;
+    [Range(10,0.5f)]
     public float sliprisistants;
     public float MaxSpeed;
     public float Sensitivity = 0.5f;
@@ -37,6 +37,7 @@ public class PlayerControler : MonoBehaviour
         //Player movement and direction
         Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x,0,Camera.transform.forward.normalized.z);
         Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
+        PlayerBody.velocity -= new Vector3(PlayerBody.velocity.x/sliprisistants,0,PlayerBody.velocity.z/sliprisistants);
         PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed,ForceMode.Force);
         PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed,ForceMode.Force);
         if (PlayerBody.velocity.magnitude > MaxSpeed)
