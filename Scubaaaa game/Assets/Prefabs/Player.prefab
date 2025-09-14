@@ -238,7 +238,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5515218674462802894}
-  m_LocalRotation: {x: -0, y: 0.7674047, z: -0, w: 0.6411631}
+  m_LocalRotation: {x: 0, y: 0.76740575, z: 0, w: 0.64116174}
   m_LocalPosition: {x: -65.57, y: 1.33, z: 241.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -339,10 +339,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7bd4d48392885e428a69bd417ada87f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 43.18
   sliprisistants: 2.08
+  movementSpeed: 43.18
+  SwimSpeed: 20
   MaxSpeed: 8
   Sensitivity: 1
-  PlayerBody: {fileID: 0}
   Camera: {fileID: 5515218674195183744}
   Jumpforce: 5

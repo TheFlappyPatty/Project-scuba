@@ -431,7 +431,7 @@ GameObject:
   - component: {fileID: 1852502389}
   - component: {fileID: 1852502388}
   m_Layer: 0
-  m_Name: dock
+  m_Name: Dock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -525,7 +525,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4587473548940751056, guid: 01e1430f1ccd4374eb524429aa9d2a53, type: 3}
       propertyPath: m_Name
-      value: w
+      value: Water
       objectReference: {fileID: 0}
     - target: {fileID: 4587473548940751056, guid: 01e1430f1ccd4374eb524429aa9d2a53, type: 3}
       propertyPath: m_TagString
