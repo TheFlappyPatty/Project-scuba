@@ -4,14 +4,20 @@ using UnityEngine;
 
 public class PlayerControler : MonoBehaviour
 {
-    public float movementSpeed = 100;
+
     [Range(10,0.5f)]
     public float sliprisistants;
+    public float movementSpeed = 100;
+    public float SwimSpeed = 20;
     public float MaxSpeed;
     public float Sensitivity = 0.5f;
-    public Rigidbody PlayerBody;
+    private Rigidbody PlayerBody;
     public GameObject Camera;
     public float Jumpforce;
+
+    private bool Inwater;
+    private bool IsTouchingGround;
+
 
     private float X = 0;
     private float Y = 0;
@@ -24,6 +30,18 @@ public class PlayerControler : MonoBehaviour
 
     public void Update()
     {
+        //finds if the player is on the ground.
+        Ray ray = new Ray(transform.position,Vector3.down);
+        RaycastHit ground = new RaycastHit();
+        if(Physics.Raycast(ray,out ground,1.1f))
+        {
+            IsTouchingGround = true;
+        }
+        else
+        {
+            IsTouchingGround = false;
+        }
+
         //Mouse Controles and cursor lock
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -34,17 +52,50 @@ public class PlayerControler : MonoBehaviour
         Y = Mathf.Clamp(Y,-80, 90);
         Camera.transform.rotation = Quaternion.Euler(-Y,X,0);
 
-        //Player movement and direction
-        Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x,0,Camera.transform.forward.normalized.z);
-        Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
-        PlayerBody.velocity -= new Vector3(PlayerBody.velocity.x/sliprisistants,0,PlayerBody.velocity.z/sliprisistants);
-        PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed,ForceMode.Force);
-        PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed,ForceMode.Force);
+        //Player movement and direction out of water
+        if (Inwater == false)
+        {
+            Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x, 0, Camera.transform.forward.normalized.z);
+            Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
+            PlayerBody.velocity -= new Vector3(PlayerBody.velocity.x / sliprisistants, 0, PlayerBody.velocity.z / sliprisistants);
+            if (Input.GetKeyDown(KeyCode.Space) && IsTouchingGround)
+            {
+                PlayerBody.AddForce(Vector3.up * Jumpforce, ForceMode.VelocityChange);
+            }
+            PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed, ForceMode.Force);
+            PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed, ForceMode.Force);
+        }
+        else //this is when the player is in water.
+        {
+            Vector3 PlayerForward = Camera.transform.forward;
+            Vector3 PlayerRight = Camera.transform.right;
+            PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * SwimSpeed, ForceMode.Force);
+            PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * SwimSpeed, ForceMode.Force);
+        }
+
+        //speed cap
         if (PlayerBody.velocity.magnitude > MaxSpeed)
         {
             PlayerBody.velocity = PlayerBody.velocity.normalized * MaxSpeed;
         }
+}
 
+
+    //finds is the player is in water or not
+        public void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == "Water")
+            {
+            Inwater = true;
+            PlayerBody.useGravity = false;
+            }
     }
-
+    public void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "Water")
+        {
+            Inwater = false;
+            PlayerBody.useGravity = true;
+        }
+    }
 }
