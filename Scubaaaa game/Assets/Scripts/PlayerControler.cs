@@ -1,10 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerControler : MonoBehaviour
 {
+    [SerializeField]
+    private int dominatehand;
+    [SerializeField]
+    private List<GameObject> Playerhands;
+    
 
+
+
+
+
+    //all the UI tools
+    private UIController UIhandler;
+    [SerializeField]
+    public LayerMask interactableObjects;
+
+
+    //player movement stats
     [Range(10,0.5f)]
     public float sliprisistants;
     public float movementSpeed = 100;
@@ -24,12 +41,79 @@ public class PlayerControler : MonoBehaviour
 
     private void Start()
     {
+        UIhandler = GameObject.Find("UI").GetComponent<UIController>();
         PlayerBody = gameObject.GetComponent<Rigidbody>();
-            Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Locked;
+        InitialiseHands();
     }
 
     public void Update()
     {
+
+        //Finds inputs for items
+       for(int i = 0; i <=9; i++)
+       {
+            if (Input.GetKeyDown(KeyCode.Alpha0 + i))
+            {
+                if(i <= Playerhands.Count)
+                { 
+                    dominatehand = i - 1;
+                    for(int f = 0; f <= Playerhands.Count -1; f++) 
+                    {
+                        if (Playerhands[f] != null) if (Playerhands[f] != Playerhands[dominatehand]) { Playerhands[f].SetActive(false); } else { Playerhands[f].SetActive(true); }
+                    }
+                }
+                else
+                {
+                    return;
+                }
+            }
+       }
+
+
+       //This Handles item pickups and interactions vvvvvvv
+        UIhandler.Popup.SetText("");
+        Ray interact = new Ray(Camera.transform.position, Camera.transform.forward);
+        RaycastHit Target = new RaycastHit();
+        if(Physics.Raycast(interact,out Target, 20f,interactableObjects))
+        {
+            if (Target.collider.tag == "Holdable")
+            {
+
+                UIhandler.Popup.SetText("Press f to Pickup " + Target.transform.name);
+                if (Input.GetKeyDown(KeyCode.F))
+                {
+                    PickupItem(Target.collider.gameObject, dominatehand);
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            DropItem();
+        }
+        //This Handles item pickups and interactions ^^^^^^^^^
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         //finds if the player is on the ground.
         Ray ray = new Ray(transform.position,Vector3.down);
         RaycastHit ground = new RaycastHit();
@@ -78,7 +162,36 @@ public class PlayerControler : MonoBehaviour
         {
             PlayerBody.velocity = PlayerBody.velocity.normalized * MaxSpeed;
         }
-}
+    }
+
+
+
+    public void PickupItem(GameObject Item,int Slot)
+    {
+        Playerhands[Slot] = Item;
+        Item.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
+        Item.GetComponent<Collider>().enabled = false;
+        UIhandler.ReadHandUI(Slot, Item.GetComponent<ItemScript>().ItemIcon);
+        Item.transform.rotation = Camera.transform.rotation;
+        float dis = 0.5f;
+        Item.transform.position = new Vector3(Camera.transform.position.x + Camera.transform.forward.normalized.x *dis,Camera.transform.position.y -0.5f + Camera.transform.forward.normalized.y * dis,Camera.transform.position.z + Camera.transform.forward.normalized.z * dis);
+        Item.transform.parent = Camera.transform;
+    }
+    public void DropItem()
+    {
+        GameObject Item = Playerhands[dominatehand];
+        UIhandler.ReadHandUI(dominatehand, null);
+        Item.transform.parent = null;
+        Item.GetComponent<Collider>().enabled = enabled;
+        Item.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        Playerhands[dominatehand] = null;
+    }
+
+
+
+
+
+
 
 
     //finds is the player is in water or not
@@ -96,6 +209,15 @@ public class PlayerControler : MonoBehaviour
         {
             Inwater = false;
             PlayerBody.useGravity = true;
+        }
+    }
+
+    //used to add the Ui to the screen and link to player
+    public void InitialiseHands()
+    {
+        foreach(GameObject n in Playerhands)
+        {
+           UIhandler.addHandElement(UIController.UItype.Hand);
         }
     }
 }
