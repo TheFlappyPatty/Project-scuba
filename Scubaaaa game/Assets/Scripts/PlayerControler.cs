@@ -9,11 +9,13 @@ public class PlayerControler : MonoBehaviour
     private int dominatehand;
     [SerializeField]
     private List<GameObject> Playerhands;
-    
 
 
 
 
+    //Players Current Function Stats vvvvvv
+    public float PlayerScraperSize = 10;
+    //Players Current Function Stats ^^^^^^^
 
     //all the UI tools
     private UIController UIhandler;
@@ -84,6 +86,15 @@ public class PlayerControler : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.F))
                 {
                     PickupItem(Target.collider.gameObject, dominatehand);
+                }
+            }
+            //for Cleaning what you Looked at
+            if(Target.collider.tag == "Cleanable")
+            {
+                UIhandler.Popup.SetText("left Click to clean");
+                if (Input.GetKey(KeyCode.Mouse0))
+                {
+                    Target.transform.GetComponent<CleanableObject>().CleanAt(Target.textureCoord,PlayerScraperSize,0.5f);
                 }
             }
         }
