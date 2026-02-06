@@ -15,6 +15,8 @@ public class PlayerControler : MonoBehaviour
 
     //Players Current Function Stats vvvvvv
     public float PlayerScraperSize = 10;
+    [Range(0,1)]
+    public float PlayerScraperStrength = 1;
     //Players Current Function Stats ^^^^^^^
 
     //all the UI tools
@@ -83,7 +85,7 @@ public class PlayerControler : MonoBehaviour
             {
 
                 UIhandler.Popup.SetText("Press f to Pickup " + Target.transform.name);
-                if (Input.GetKeyDown(KeyCode.F))
+                if (Input.GetKeyDown(KeyCode.F) && Playerhands[dominatehand]== null)
                 {
                     PickupItem(Target.collider.gameObject, dominatehand);
                 }
@@ -94,7 +96,7 @@ public class PlayerControler : MonoBehaviour
                 UIhandler.Popup.SetText("left Click to clean");
                 if (Input.GetKey(KeyCode.Mouse0))
                 {
-                    Target.transform.GetComponent<CleanableObject>().CleanAt(Target.textureCoord,PlayerScraperSize,0.5f);
+                    Target.transform.GetComponent<CleanableObject>().CleanAt(Target.textureCoord,PlayerScraperSize,PlayerScraperStrength);
                 }
             }
         }
