@@ -14,18 +14,23 @@ public class PlayerControler : MonoBehaviour
 
 
     //Players Current Function Stats vvvvvv
+    [Header("Cleaning tools")]
     public float PlayerScraperSize = 10;
     [Range(0,1)]
     public float PlayerScraperStrength = 1;
     //Players Current Function Stats ^^^^^^^
 
     //all the UI tools
+    [Space()]
+    [Header("UI handeler")]
     private UIController UIhandler;
     [SerializeField]
     public LayerMask interactableObjects;
 
 
     //player movement stats
+    [Space]
+    [Header("Player stats")]
     [Range(10,0.5f)]
     public float sliprisistants;
     public float movementSpeed = 100;
@@ -35,13 +40,25 @@ public class PlayerControler : MonoBehaviour
     private Rigidbody PlayerBody;
     public GameObject Camera;
     public float Jumpforce;
-
+    //player states
+    private PlayerState playerState = PlayerState.InAir;
     private bool Inwater;
     private bool IsTouchingGround;
 
 
     private float X = 0;
     private float Y = 0;
+
+
+    private enum PlayerState
+    {
+        Inwater,
+        Onground,
+        InAir,
+        Paused,
+
+
+    }
 
     private void Start()
     {
@@ -77,98 +94,125 @@ public class PlayerControler : MonoBehaviour
 
        //This Handles item pickups and interactions vvvvvvv
         UIhandler.Popup.SetText("");
-        Ray interact = new Ray(Camera.transform.position, Camera.transform.forward);
-        RaycastHit Target = new RaycastHit();
-        if(Physics.Raycast(interact,out Target, 20f,interactableObjects))
+        if(playerState != PlayerState.Paused)
         {
-            if (Target.collider.tag == "Holdable")
+            Ray interact = new Ray(Camera.transform.position, Camera.transform.forward);
+            RaycastHit Target = new RaycastHit();
+            if (Physics.Raycast(interact, out Target, 20f, interactableObjects))
             {
-
-                UIhandler.Popup.SetText("Press f to Pickup " + Target.transform.name);
-                if (Input.GetKeyDown(KeyCode.F) && Playerhands[dominatehand]== null)
+                if (Target.collider.tag == "Holdable")
                 {
-                    PickupItem(Target.collider.gameObject, dominatehand);
+
+                    UIhandler.Popup.SetText("Press f to Pickup " + Target.transform.name);
+                    if (Input.GetKeyDown(KeyCode.F) && Playerhands[dominatehand] == null)
+                    {
+                        PickupItem(Target.collider.gameObject, dominatehand);
+                    }
+                }
+                //for Cleaning what you Looked at
+                if (Target.collider.tag == "Cleanable")
+                {
+                    UIhandler.Popup.SetText("left Click to clean");
+                    if (Input.GetKey(KeyCode.Mouse0))
+                    {
+                        Target.transform.GetComponent<CleanableObject>().CleanAt(Target.textureCoord, PlayerScraperSize, PlayerScraperStrength * Time.deltaTime);
+                    }
                 }
             }
-            //for Cleaning what you Looked at
-            if(Target.collider.tag == "Cleanable")
+            if (Input.GetKeyDown(KeyCode.G))
             {
-                UIhandler.Popup.SetText("left Click to clean");
-                if (Input.GetKey(KeyCode.Mouse0))
+                DropItem();
+            }
+            //This Handles item pickups and interactions ^^^^^^^^^
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if(playerState != PlayerState.Paused)
+        {
+            //finds if the player is on the ground.
+            if (playerState != PlayerState.Inwater && playerState != PlayerState.Paused)
+            {
+                Ray ray = new Ray(transform.position, Vector3.down);
+                RaycastHit ground = new RaycastHit();
+                if (Physics.Raycast(ray, out ground, 1.1f))
                 {
-                    Target.transform.GetComponent<CleanableObject>().CleanAt(Target.textureCoord,PlayerScraperSize,PlayerScraperStrength);
+                    playerState = PlayerState.Onground;
+                }
+                else
+                {
+                    playerState = PlayerState.InAir;
                 }
             }
         }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            DropItem();
-        }
-        //This Handles item pickups and interactions ^^^^^^^^^
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //finds if the player is on the ground.
-        Ray ray = new Ray(transform.position,Vector3.down);
-        RaycastHit ground = new RaycastHit();
-        if(Physics.Raycast(ray,out ground,1.1f))
-        {
-            IsTouchingGround = true;
-        }
-        else
-        {
-            IsTouchingGround = false;
-        }
 
         //Mouse Controles and cursor lock
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Cursor.lockState = CursorLockMode.None;
+            if(playerState == PlayerState.Paused)
+            {
+               playerState = PlayerState.InAir;
+                Time.timeScale = 1;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                playerState = PlayerState.Paused;
+                Time.timeScale = 0;
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
-        X += Input.GetAxis("Mouse X") * Sensitivity;
-        Y += Input.GetAxis("Mouse Y") * Sensitivity;
-        Y = Mathf.Clamp(Y,-80, 90);
-        Camera.transform.rotation = Quaternion.Euler(-Y,X,0);
+
 
         //Player movement and direction out of water
-        if (Inwater == false)
+        if (playerState != PlayerState.Paused)
         {
-            Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x, 0, Camera.transform.forward.normalized.z);
-            Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
-            PlayerBody.velocity -= new Vector3(PlayerBody.velocity.x / sliprisistants, 0, PlayerBody.velocity.z / sliprisistants);
-            if (Input.GetKeyDown(KeyCode.Space) && IsTouchingGround)
+            X += Input.GetAxis("Mouse X") * Sensitivity;
+            Y += Input.GetAxis("Mouse Y") * Sensitivity;
+            Y = Mathf.Clamp(Y, -80, 90);
+            Camera.transform.rotation = Quaternion.Euler(-Y, X, 0);
+
+
+            if (Inwater == false)
             {
-                PlayerBody.AddForce(Vector3.up * Jumpforce, ForceMode.VelocityChange);
+                Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x, 0, Camera.transform.forward.normalized.z);
+                Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
+                PlayerBody.velocity -= new Vector3(PlayerBody.velocity.x / sliprisistants, 0, PlayerBody.velocity.z / sliprisistants);
+                if (Input.GetKeyDown(KeyCode.Space) && IsTouchingGround)
+                {
+                    PlayerBody.AddForce(Vector3.up * Jumpforce, ForceMode.VelocityChange);
+                }
+                PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed, ForceMode.Force);
+                PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed, ForceMode.Force);
             }
-            PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed, ForceMode.Force);
-            PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed, ForceMode.Force);
+            else //this is when the player is in water.
+            {
+                Vector3 PlayerForward = Camera.transform.forward;
+                Vector3 PlayerRight = Camera.transform.right;
+                PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * SwimSpeed, ForceMode.Force);
+                PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * SwimSpeed, ForceMode.Force);
+            }
         }
-        else //this is when the player is in water.
-        {
-            Vector3 PlayerForward = Camera.transform.forward;
-            Vector3 PlayerRight = Camera.transform.right;
-            PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * SwimSpeed, ForceMode.Force);
-            PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * SwimSpeed, ForceMode.Force);
-        }
+
 
         //speed cap
         if (PlayerBody.velocity.magnitude > MaxSpeed)
@@ -205,14 +249,12 @@ public class PlayerControler : MonoBehaviour
 
 
 
-
-
     //finds is the player is in water or not
-        public void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Water")
             {
-            Inwater = true;
+            playerState = PlayerState.Inwater;
             PlayerBody.useGravity = false;
             }
     }
@@ -220,7 +262,7 @@ public class PlayerControler : MonoBehaviour
     {
         if (other.tag == "Water")
         {
-            Inwater = false;
+            playerState = PlayerState.InAir;
             PlayerBody.useGravity = true;
         }
     }
