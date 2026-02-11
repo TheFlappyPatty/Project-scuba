@@ -27,7 +27,6 @@ public class PlayerControler : MonoBehaviour
     [SerializeField]
     public LayerMask interactableObjects;
 
-
     //player movement stats
     [Space]
     [Header("Player stats")]
