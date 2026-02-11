@@ -31,19 +31,23 @@ public class PlayerControler : MonoBehaviour
     //player movement stats
     [Space]
     [Header("Player stats")]
-    [Range(10,0.5f)]
+    [Range(10,1f)]
     public float sliprisistants;
+    [Range(100, 10f)]
+    public float WaterSlipRisistants;
     public float movementSpeed = 100;
     public float SwimSpeed = 20;
-    public float MaxSpeed;
+    public float MaxSpeedOnground = 8;
+    public float MaxSpeedSwimming = 2;
+    public float MaxAirSpeed = 20;
     public float Sensitivity = 0.5f;
     private Rigidbody PlayerBody;
     public GameObject Camera;
     public float Jumpforce;
     //player states
+    [SerializeField]
     private PlayerState playerState = PlayerState.InAir;
-    private bool Inwater;
-    private bool IsTouchingGround;
+    private PlayerState PreviuseState;
 
 
     private float X = 0;
@@ -162,20 +166,19 @@ public class PlayerControler : MonoBehaviour
                 }
             }
         }
-
-
-
         //Mouse Controles and cursor lock
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+
             if(playerState == PlayerState.Paused)
             {
-               playerState = PlayerState.InAir;
+               playerState = PreviuseState;
                 Time.timeScale = 1;
                 Cursor.lockState = CursorLockMode.Locked;
             }
             else
             {
+                PreviuseState = playerState;
                 playerState = PlayerState.Paused;
                 Time.timeScale = 0;
                 Cursor.lockState = CursorLockMode.None;
@@ -192,12 +195,15 @@ public class PlayerControler : MonoBehaviour
             Camera.transform.rotation = Quaternion.Euler(-Y, X, 0);
 
 
-            if (Inwater == false)
+            if (playerState != PlayerState.Inwater)
             {
                 Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x, 0, Camera.transform.forward.normalized.z);
                 Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
-                PlayerBody.velocity -= new Vector3(PlayerBody.velocity.x / sliprisistants, 0, PlayerBody.velocity.z / sliprisistants);
-                if (Input.GetKeyDown(KeyCode.Space) && IsTouchingGround)
+                if (PlayerBody.velocity.magnitude > 1)
+                {
+                    PlayerBody.velocity -= new Vector3(PlayerBody.velocity.normalized.x / sliprisistants,0, PlayerBody.velocity.normalized.z / sliprisistants);
+                }
+                if (Input.GetKeyDown(KeyCode.Space) && playerState == PlayerState.Onground)
                 {
                     PlayerBody.AddForce(Vector3.up * Jumpforce, ForceMode.VelocityChange);
                 }
@@ -206,19 +212,47 @@ public class PlayerControler : MonoBehaviour
             }
             else //this is when the player is in water.
             {
-                Vector3 PlayerForward = Camera.transform.forward;
-                Vector3 PlayerRight = Camera.transform.right;
-                PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * SwimSpeed, ForceMode.Force);
-                PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * SwimSpeed, ForceMode.Force);
+                Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x, Camera.transform.forward.normalized.y, Camera.transform.forward.normalized.z);
+                Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, Camera.transform.right.normalized.y, Camera.transform.right.normalized.z);
+                PlayerBody.AddForce(Vector3.up * SwimSpeed * Input.GetAxis("Jump"), ForceMode.Force);
+                PlayerBody.AddForce(Camera.transform.forward.normalized * Input.GetAxis("Vertical") * SwimSpeed, ForceMode.Force);
+                PlayerBody.AddForce(Camera.transform.right.normalized * Input.GetAxis("Horizontal") * SwimSpeed, ForceMode.Force);
+                if (PlayerBody.velocity.magnitude > 0)
+                {
+                    PlayerBody.velocity -= new Vector3(PlayerBody.velocity.normalized.x / WaterSlipRisistants, PlayerBody.velocity.normalized.y / WaterSlipRisistants, PlayerBody.velocity.normalized.z / WaterSlipRisistants);
+                }
             }
         }
 
 
-        //speed cap
-        if (PlayerBody.velocity.magnitude > MaxSpeed)
+        //speed caps
+        var x = PlayerBody.velocity.normalized.x;
+        var z = PlayerBody.velocity.normalized.z;
+        switch (playerState)
         {
-            PlayerBody.velocity = PlayerBody.velocity.normalized * MaxSpeed;
+            default:
+                if (PlayerBody.velocity.magnitude > MaxSpeedOnground)
+                {
+                    PlayerBody.velocity = new Vector3(x,PlayerBody.velocity.y/MaxSpeedOnground,z) * MaxSpeedOnground;
+                    Debug.Log("walking");
+                }
+                break;
+            case PlayerState.InAir:
+                if (PlayerBody.velocity.magnitude > MaxAirSpeed)
+                {
+                    PlayerBody.velocity = new Vector3(x,PlayerBody.velocity.y/MaxAirSpeed,z) * MaxAirSpeed;
+                    Debug.Log("falling");
+                }
+                break;
+            case PlayerState.Inwater:
+                if (PlayerBody.velocity.magnitude > MaxSpeedSwimming)
+                {
+                    PlayerBody.velocity = PlayerBody.velocity.normalized * MaxSpeedSwimming;
+                    Debug.Log("swimming");
+                }
+                break;
         }
+
     }
 
 

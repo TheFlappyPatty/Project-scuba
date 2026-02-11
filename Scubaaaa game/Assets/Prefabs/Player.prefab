@@ -505,10 +505,13 @@ MonoBehaviour:
   sliprisistants: 2.08
   movementSpeed: 43.18
   SwimSpeed: 20
-  MaxSpeed: 8
+  MaxSpeedOnground: 8
+  MaxSpeedSwimming: 2
+  MaxAirSpeed: 262.97
   Sensitivity: 1
   Camera: {fileID: 5515218674195183744}
   Jumpforce: 5
+  playerState: 2
 --- !u!1 &7801190290768639249
 GameObject:
   m_ObjectHideFlags: 0
