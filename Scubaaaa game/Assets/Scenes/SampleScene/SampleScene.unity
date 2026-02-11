@@ -963,7 +963,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 714921535}
   m_LocalRotation: {x: -0, y: 0.7674047, z: -0, w: 0.6411631}
-  m_LocalPosition: {x: -67.933, y: 1.754, z: 224.742}
+  m_LocalPosition: {x: -67.933, y: 2.19, z: 224.742}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -994,13 +994,17 @@ MonoBehaviour:
   interactableObjects:
     serializedVersion: 2
     m_Bits: 8
-  sliprisistants: 2.08
+  sliprisistants: 1.68
+  WaterSlipRisistants: 100
   movementSpeed: 43.18
   SwimSpeed: 20
-  MaxSpeed: 8
+  MaxSpeedOnground: 4
+  MaxSpeedSwimming: 2
+  MaxAirSpeed: 8
   Sensitivity: 1
   Camera: {fileID: 963194225}
   Jumpforce: 5
+  playerState: 2
 --- !u!54 &714921541
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2263,7 +2267,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1852502387}
   m_LocalRotation: {x: -0, y: -0.83430064, z: -0, w: 0.5513099}
-  m_LocalPosition: {x: -65.84, y: 0.87, z: 226.7}
+  m_LocalPosition: {x: -65.45, y: 1.31, z: 226.87}
   m_LocalScale: {x: 5.4108634, y: 0.051242173, z: 17.943228}
   m_ConstrainProportionsScale: 0
   m_Children: []
