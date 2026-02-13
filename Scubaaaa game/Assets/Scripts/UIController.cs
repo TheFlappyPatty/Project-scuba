@@ -28,7 +28,7 @@ public class UIController : MonoBehaviour
 
     public float UIspacing;
     //finds the type of ui your adding for display only
-    public void addHandElement(UItype f)
+    public void AddUIElement(UItype f)
     {
         if(UItype.Hand == f)
         {
@@ -37,7 +37,7 @@ public class UIController : MonoBehaviour
         }
         if(UItype.Quest == f)
         {
-            Debug.Log("Quest system not Implemented yet");
+
         }
 
     }
@@ -75,6 +75,8 @@ public class UIController : MonoBehaviour
             count++;
         }
     }
+
+    public void BuildActiveQuest;
 
     public enum UItype {
     Hand,

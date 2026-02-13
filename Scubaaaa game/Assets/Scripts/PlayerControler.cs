@@ -305,7 +305,7 @@ public class PlayerControler : MonoBehaviour
     {
         foreach(GameObject n in Playerhands)
         {
-           UIhandler.addHandElement(UIController.UItype.Hand);
+           UIhandler.AddUIElement(UIController.UItype.Hand);
         }
     }
 }
