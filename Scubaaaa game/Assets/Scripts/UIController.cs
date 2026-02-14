@@ -76,8 +76,6 @@ public class UIController : MonoBehaviour
         }
     }
 
-    public void BuildActiveQuest;
-
     public enum UItype {
     Hand,
     Quest,
