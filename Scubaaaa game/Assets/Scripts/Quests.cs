@@ -5,6 +5,7 @@ using UnityEngine;
 public class Quests : MonoBehaviour
 {
     public QuestType Quest;
+    public GameObject Questpanel;
 
 
     public enum QuestType
@@ -12,14 +13,6 @@ public class Quests : MonoBehaviour
         BoatClean,
         FindItem,
         bouychain,
-    }
-    public void BoatCleaner(string BoatName, float BoatCompletion, int Docknumber, string Description, bool boatTimer, float Timerlenght, float timerLenght)
-    {
-        BoatName = "Default Boat";
-        BoatCompletion = 0;
-        Docknumber = 0;
-        Description = "Describe the back story of the boat or boat Details";
-        boatTimer = false;
     }
 
 

@@ -10,8 +10,8 @@ public class UIController : MonoBehaviour
 
 
     //UI Objects
-    [SerializeField]
-    private GameObject Quest;
+    public List<GameObject> InactiveQuests;
+    public List<GameObject> activeQuests;
     [SerializeField]
     private Canvas canvas;
     [SerializeField]
