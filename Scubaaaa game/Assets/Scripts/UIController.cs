@@ -12,10 +12,14 @@ public class UIController : MonoBehaviour
     //UI Objects
     public List<GameObject> InactiveQuests;
     public List<GameObject> activeQuests;
+    public int ActiveQuestLimit = 6;
+
     [SerializeField]
     private Canvas canvas;
     [SerializeField]
     private GameObject hand;
+    [SerializeField]
+    private GameObject BoatQuest;
     public TextMeshProUGUI Popup;
     [SerializeField]
     private Texture EmptieHand;
@@ -28,15 +32,23 @@ public class UIController : MonoBehaviour
 
     public float UIspacing;
     //finds the type of ui your adding for display only
-    public void AddUIElement(UItype f)
+    public void AddUIElement(UItype f,GameObject g)
     {
         if(UItype.Hand == f)
         {
         UIHandElements.Add(Instantiate(hand,canvas.transform));
             FormateUIHands();
         }
-        if(UItype.Quest == f)
+        if(UItype.Quest == f && g != null)
         {
+            if (ActiveQuestLimit >= activeQuests.Count)
+            {
+            activeQuests.Add(Instantiate(BoatQuest,canvas.transform));
+            FormateUIQuest();
+            } else
+            {
+                InactiveQuests.Add(Instantiate(BoatQuest, canvas.transform));
+            }
 
         }
 
@@ -72,6 +84,15 @@ public class UIController : MonoBehaviour
         foreach(GameObject hand in UIHandElements)
         {
             hand.GetComponent<RectTransform>().anchoredPosition = new Vector2(-775 + 100 * count,-420);
+            count++;
+        }
+    }
+    void FormateUIQuest()
+    {
+        int count = 0;
+        foreach(GameObject objective in activeQuests)
+        {
+            objective.GetComponent<RectTransform>().anchoredPosition = new Vector2(742,275 - 100 * count);
             count++;
         }
     }

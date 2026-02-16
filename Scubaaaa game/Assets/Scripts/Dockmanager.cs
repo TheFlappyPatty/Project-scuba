@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class laptop : MonoBehaviour
+public class Dockmanager : MonoBehaviour
 {
-
+    public List<GameObject> DockSpaces;
 }

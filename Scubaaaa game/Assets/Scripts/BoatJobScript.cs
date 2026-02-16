@@ -18,6 +18,6 @@ public class BoatJobScript : MonoBehaviour
     }
     public void StartJob()
     {
-        UI.InactiveQuests.Add(gameObject);
+        UI.AddUIElement(UIController.UItype.Quest,BoatToClean);
     }
 }
