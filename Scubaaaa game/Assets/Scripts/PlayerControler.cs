@@ -73,6 +73,11 @@ public class PlayerControler : MonoBehaviour
 
     public void Update()
     {
+        if (Input.GetKeyDown(KeyCode.K)) UIhandler.syncLaptop();
+
+
+
+
 
         //Finds inputs for items
        for(int i = 0; i <=9; i++)

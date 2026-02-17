@@ -20,9 +20,12 @@ public class UIController : MonoBehaviour
     private GameObject hand;
     [SerializeField]
     private GameObject BoatQuest;
+    [SerializeField]
+    private GameObject LaptopboatUI;
     public TextMeshProUGUI Popup;
     [SerializeField]
     private Texture EmptieHand;
+    public laptop Laptop;
 
     //list of all the UIHands in order
     [SerializeField]
@@ -43,8 +46,9 @@ public class UIController : MonoBehaviour
         {
             if (ActiveQuestLimit >= activeQuests.Count)
             {
-            activeQuests.Add(Instantiate(BoatQuest,canvas.transform));
-            FormateUIQuest();
+                activeQuests.Add(Instantiate(BoatQuest,canvas.transform));
+                syncLaptop();
+                FormateUIQuest();
             } else
             {
                 InactiveQuests.Add(Instantiate(BoatQuest, canvas.transform));
@@ -96,6 +100,68 @@ public class UIController : MonoBehaviour
             count++;
         }
     }
+   public void syncLaptop()
+    {
+        foreach (GameObject f in Laptop.ActiveQuestsinlist)
+        {
+            Destroy(f);
+        }
+        foreach (GameObject h in Laptop.InactiveQuestinlist)
+        {
+            Destroy(h);
+        }
+        Laptop.InactiveQuestinlist.Clear();
+        Laptop.ActiveQuestsinlist.Clear();
+        foreach (GameObject  r in InactiveQuests)
+        {
+            Laptop.InactiveQuestinlist.Add(r.GetComponent<JobDataHUD>().LaptopUIhud = Instantiate(LaptopboatUI, Laptop.InActiveQuestlist.transform));
+            r.GetComponent<JobDataHUD>().Refresh();
+        }
+        foreach (GameObject g in activeQuests)
+        {
+            Laptop.ActiveQuestsinlist.Add(g.GetComponent<JobDataHUD>().LaptopUIhud = Instantiate(LaptopboatUI, Laptop.ActiveQuestlist.transform));
+            g.GetComponent<JobDataHUD>().Refresh();
+        }
+        FormateActiveQuestList();
+        FormateInactiveQuestlist();
+    }
+
+    void FormateActiveQuestList()
+    {
+        int count = 0;
+        foreach(GameObject f in Laptop.ActiveQuestsinlist)
+        {
+            f.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, 111.2f - 100 * count, 0);
+            Debug.Log("formated");
+            count++;
+        }
+
+    }
+    void FormateInactiveQuestlist()
+    {
+        int count = 0;
+        foreach(GameObject f in Laptop.InactiveQuestinlist)
+        {
+            f.GetComponent<RectTransform>().anchoredPosition = new Vector3(0, 111.2f - 100 * count, 0);
+            Debug.Log("formated");
+            count++;
+        }
+    }
+
+
+    public void UntrackQuest(GameObject Quest)
+    {
+        activeQuests.Remove(Quest.GetComponent<Trackanduntrack>().HudData);
+        InactiveQuests.Add(Quest.GetComponent<Trackanduntrack>().HudData);
+        syncLaptop();
+    }
+    public void trackQuest(GameObject Quest)
+    {
+        InactiveQuests.Remove(Quest.GetComponent<Trackanduntrack>().HudData);
+        activeQuests.Add(Quest.GetComponent<Trackanduntrack>().HudData);
+        syncLaptop();
+    }
+
 
     public enum UItype {
     Hand,

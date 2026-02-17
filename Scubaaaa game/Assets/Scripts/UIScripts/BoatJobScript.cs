@@ -19,5 +19,6 @@ public class BoatJobScript : MonoBehaviour
     public void StartJob()
     {
         UI.AddUIElement(UIController.UItype.Quest,BoatToClean);
+        Destroy(gameObject);
     }
 }
