@@ -203,6 +203,7 @@ public class PlayerControler : MonoBehaviour
             {
                 Vector3 PlayerForward = new Vector3(Camera.transform.forward.normalized.x, 0, Camera.transform.forward.normalized.z);
                 Vector3 PlayerRight = new Vector3(Camera.transform.right.normalized.x, 0, Camera.transform.right.normalized.z);
+                float sprint = 1 + Input.GetAxis("Sprint");
                 if (PlayerBody.velocity.magnitude > 1)
                 {
                     PlayerBody.velocity -= new Vector3(PlayerBody.velocity.normalized.x / sliprisistants,0, PlayerBody.velocity.normalized.z / sliprisistants);
@@ -211,7 +212,7 @@ public class PlayerControler : MonoBehaviour
                 {
                     PlayerBody.AddForce(Vector3.up * Jumpforce, ForceMode.VelocityChange);
                 }
-                PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed, ForceMode.Force);
+                PlayerBody.AddForce(PlayerForward * Input.GetAxis("Vertical") * movementSpeed * sprint, ForceMode.Force);
                 PlayerBody.AddForce(PlayerRight * Input.GetAxis("Horizontal") * movementSpeed, ForceMode.Force);
             }
             else //this is when the player is in water.
